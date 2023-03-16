@@ -1,6 +1,5 @@
 import java.io.*;
 
-//커밋 메시지 수정용 왜 그게 제목으로 커밋됐지
 public class Calc {
     int token; int value; int ch;
     private PushbackInputStream input;
