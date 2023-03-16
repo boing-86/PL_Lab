@@ -128,7 +128,7 @@ public class Calc {
 
     }
 
-    Object relop(){
+    String relop(){
         // relop -> '==' | '!=' | '<' | '>' | '<=' | '>='
 
         int result = ch;
@@ -136,22 +136,28 @@ public class Calc {
         try{
             ch = input.read();
             if (ch == '='){ // ==, !=, <=, >= 의 경우
-                if (result == '='){
-                    return "==";
-                }
-                else if(result == '!'){
+                switch (result){
+                    case '=':
+                        return "==";
+                        break;
 
-                }
-                else if (result == '<'){
+                    case '!':
+                        return "!=";
+                        break;
 
-                }
-                else if(result == '>'){
+                    case '<' :
+                        return "<=";
+                        break;
 
+                    case '>' :
+                        return ">=";
+                        break;
                 }
             }
-            else{
+            else if(ch == ' ' || ch == '\t' ){
+
                 if (result == '<'){
-                    return result;
+
                 }
                 else if(result == '>'){
                 }
