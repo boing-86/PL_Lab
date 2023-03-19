@@ -13,7 +13,6 @@ public class Calc {
         while(true) {
             try  {
                 ch = input.read();
-                System.out.println((char)ch);
                 if (ch == ' ' || ch == '\t' || ch == '\r') ;
                 else {
                     if (Character.isDigit(ch)) {
@@ -50,8 +49,9 @@ public class Calc {
     }
 
     void match(int c) {
-        if (token == c)
+        if (token == c) {
             token = getToken();
+        }
         else error();
     }
 
@@ -65,37 +65,36 @@ public class Calc {
 
     Object expr() {
         /* expr -> bexp { '&' bexp  | '|' bexp } | '!' expr | true | false */
-        Object result = new Object();
+        Object result;
 
         if(token == '!'){ // ! expr
-            System.out.print("############ !expr #############\n");
             match('!');
             result = !(boolean) expr();
         }
 
         else if(token == 't'){ //true
-                result = true;
-                return result;
+            result = true;
+            return result;
         }
 
         else if(token == 'f'){ //false
-                result = false;
-                return result;
+            result = false;
+            return result;
 
         }
 
-        else{ // bexp {'&' bexp || '|' bexp }
-            System.out.print("############ bexp {'&' bexp || '|' bexp } ############\n");
+        else{ // bexp {'&' bexp | '|' bexp }
             result = bexp();
-
             while(token == '&' || token == '|'){
                 if(token == '&'){
                     match('&');
-                    result = (boolean)result && (boolean)bexp();
+                    Object right = bexp();
+                    result = (boolean)result && (boolean) right;
                 }
                 else {
                     match('|');
-                    result = (boolean) result && (boolean) bexp();
+                    Object right = bexp();
+                    result = (boolean)result || (boolean) right;
                 }
             }
         }
@@ -106,36 +105,32 @@ public class Calc {
     Object bexp( ) {
         // bexp -> aexp [relop aexp]
         int result = aexp();
-        String r_operator = relop();
-        System.out.print("######### r_operand");
-        System.out.print(r_operator);
-
-        if(r_operator != null){
+        String op = relop();
+        if(op != null) {
             int right = aexp();
 
-            switch (r_operator){
+            switch (op) {
                 case "==":
-                    System.out.print("\n" + result + " == " + right + "\n");
-                    boolean a = result == right;
-                    return a ;
+                    return result == right;
 
                 case "!=":
                     return result != right;
 
-                case "<" :
+                case "<":
                     return result < right;
 
-                case "<=" :
+                case "<=":
                     return result <= right;
 
-                case ">" :
+                case ">":
                     return result > right;
 
-                case ">=" :
+                case ">=":
                     return result >= right;
+                default:
+                    return null;
             }
         }
-
         return result;
     }
 
@@ -149,13 +144,15 @@ public class Calc {
             case '=':
                 match('=');
                 if (ch == '='){
+                    match('=');
                     r_result = "==";
                 }
                 break;
 
             case '!':
-                match('=');
+                match('!');
                 if (ch == '='){
+                    match('=');
                     r_result = "!=";
                 }
                 break;
@@ -163,6 +160,7 @@ public class Calc {
             case '<':
                 match('<');
                 if (ch == '='){
+                    match('=');
                     r_result = "<=";
                 }
                 else{
@@ -173,6 +171,7 @@ public class Calc {
             case '>':
                 match('>');
                 if (ch == '='){
+                    match('=');
                     r_result = ">=";
                 }
                 else{
@@ -181,7 +180,6 @@ public class Calc {
                 break;
         }
 
-        System.out.print("##### relop = " + r_result + "############ ");
         return r_result;
     }
 
@@ -198,8 +196,6 @@ public class Calc {
                 result -= term();
             }
         }
-
-        System.out.print("##### aexp = " + result + "############ ");
         return result;
     }
 
@@ -237,7 +233,6 @@ public class Calc {
     void parse( ) {
         token = getToken(); // get the first token
         command();          // call the parsing command
-        //System.out.print(relop());
     }
 
     public static void main(String args[]) {
