@@ -13,6 +13,7 @@ public class Calc {
         while(true) {
             try  {
                 ch = input.read();
+                System.out.println((char)ch);
                 if (ch == ' ' || ch == '\t' || ch == '\r') ;
                 else {
                     if (Character.isDigit(ch)) {
@@ -56,7 +57,7 @@ public class Calc {
 
     void command( ) {
         /* command -> expr '\n' */
-        int result = aexp();
+        Object result = expr();
         if (token == '\n') /* end the parse and print the result */
             System.out.println(result);
         else error();
@@ -64,48 +65,29 @@ public class Calc {
 
     Object expr() {
         /* expr -> bexp { '&' bexp  | '|' bexp } | '!' expr | true | false */
-        Object result;
+        Object result = new Object();
 
         if(token == '!'){ // ! expr
+            System.out.print("############ !expr #############\n");
             match('!');
             result = !(boolean) expr();
         }
+
         else if(token == 't'){ //true
-            String t_candidate = "t";
-            try{
-                char next = (char)input.read();
-                while(Character.isAlphabetic(ch)){
-                    t_candidate.concat(Character.toString(next));
-                    next = (char)input.read();
-                }
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-            if(t_candidate.equals("true")){
                 result = true;
                 return result;
-            }
         }
 
         else if(token == 'f'){ //false
-            String f_candidate = "f";
-            try{
-                char next = (char)input.read();
-                while(Character.isAlphabetic(ch)){
-                    f_candidate.concat(Character.toString(next));
-                    next = (char)input.read();
-                }
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-            if(f_candidate.equals("false")){
                 result = false;
                 return result;
-            }
+
         }
 
         else{ // bexp {'&' bexp || '|' bexp }
+            System.out.print("############ bexp {'&' bexp || '|' bexp } ############\n");
             result = bexp();
+
             while(token == '&' || token == '|'){
                 if(token == '&'){
                     match('&');
@@ -124,55 +106,87 @@ public class Calc {
     Object bexp( ) {
         // bexp -> aexp [relop aexp]
         int result = aexp();
+        String r_operator = relop();
+        System.out.print("######### r_operand");
+        System.out.print(r_operator);
 
+        if(r_operator != null){
+            int right = aexp();
 
+            switch (r_operator){
+                case "==":
+                    System.out.print("\n" + result + " == " + right + "\n");
+                    boolean a = result == right;
+                    return a ;
+
+                case "!=":
+                    return result != right;
+
+                case "<" :
+                    return result < right;
+
+                case "<=" :
+                    return result <= right;
+
+                case ">" :
+                    return result > right;
+
+                case ">=" :
+                    return result >= right;
+            }
+        }
+
+        return result;
     }
 
     String relop(){
         // relop -> '==' | '!=' | '<' | '>' | '<=' | '>='
 
         int result = ch;
+        String r_result = null;
 
-        try{
-            ch = input.read();
-            if (ch == '='){ // ==, !=, <=, >= 의 경우
-                switch (result){
-                    case '=':
-                        return "==";
-                        break;
-
-                    case '!':
-                        return "!=";
-                        break;
-
-                    case '<' :
-                        return "<=";
-                        break;
-
-                    case '>' :
-                        return ">=";
-                        break;
+        switch (result){
+            case '=':
+                match('=');
+                if (ch == '='){
+                    r_result = "==";
                 }
-            }
-            else if(ch == ' ' || ch == '\t' ){
+                break;
 
-                if (result == '<'){
-
+            case '!':
+                match('=');
+                if (ch == '='){
+                    r_result = "!=";
                 }
-                else if(result == '>'){
+                break;
+
+            case '<':
+                match('<');
+                if (ch == '='){
+                    r_result = "<=";
                 }
+                else{
+                    r_result = "<";
+                }
+                break;
 
-            }
-
-        } catch(IOException e){
-            System.err.println(e);
+            case '>':
+                match('>');
+                if (ch == '='){
+                    r_result = ">=";
+                }
+                else{
+                    r_result = ">";
+                }
+                break;
         }
 
-        return result;
+        System.out.print("##### relop = " + r_result + "############ ");
+        return r_result;
     }
 
     int aexp( ) {
-        /* aexp -> term { '+' | '-' term ('-' 는 아직 구현 안함)} */
+        /* aexp -> term { '+' | '-' term } */
         int result = term();
         while (token == '+' || token == '-') {
             if(token == '+'){
@@ -184,11 +198,13 @@ public class Calc {
                 result -= term();
             }
         }
+
+        System.out.print("##### aexp = " + result + "############ ");
         return result;
     }
 
     int term( ) {
-        /* term -> factor { '*' factor | '/' factor (나누기 구현 아직) } */
+        /* term -> factor { '*' factor | '/' factor } */
         int result = factor();
         while (token == '*' || token == '/') {
             if(token == '*'){
