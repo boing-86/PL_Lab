@@ -65,7 +65,7 @@ public class Calc {
 
     Object expr() {
         /* expr -> bexp { '&' bexp  | '|' bexp } | '!' expr | true | false */
-        Object result;
+        Object result = new Object();
 
         if(token == '!'){ // ! expr
             match('!');
@@ -73,8 +73,7 @@ public class Calc {
         }
 
         else if(token == 't'){ //true
-            result = true;
-            return result;
+
         }
 
         else if(token == 'f'){ //false
