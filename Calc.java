@@ -66,20 +66,41 @@ public class Calc {
     Object expr() {
         /* expr -> bexp { '&' bexp  | '|' bexp } | '!' expr | true | false */
         Object result = new Object();
-
         if(token == '!'){ // ! expr
             match('!');
             result = !(boolean) expr();
         }
 
         else if(token == 't'){ //true
-
+            String t_candidate = "t";
+            match('t');
+            while(Character.isAlphabetic((char)ch)){
+                t_candidate = t_candidate + (char)ch;
+                match(ch);
+            }
+            if(t_candidate.equals("true")){
+                result = true;
+                return result;
+            }
+            else{
+                return "true/false error";
+            }
         }
 
         else if(token == 'f'){ //false
-            result = false;
-            return result;
-
+            String f_candidate = "f";
+            match('f');
+            while(Character.isAlphabetic((char)ch)){
+                f_candidate = f_candidate + (char)ch;
+                match(ch);
+            }
+            if(f_candidate.equals("false")){
+                result = false;
+                return result;
+            }
+            else{
+                return "true/false error";
+            }
         }
 
         else{ // bexp {'&' bexp | '|' bexp }
@@ -90,6 +111,7 @@ public class Calc {
                     Object right = bexp();
                     result = (boolean)result && (boolean) right;
                 }
+
                 else {
                     match('|');
                     Object right = bexp();
@@ -215,7 +237,7 @@ public class Calc {
     }
 
     int factor() {
-        /* factor -> '(' expr ')' | number */
+        /* factor -> '(' aexp ')' | number */
         int result = 0;
         if (token == '(') {
             match('(');
