@@ -1,5 +1,6 @@
-// Parser.java
+package Lab02;// Parser.java
 // Parser for language S
+
 
 public class Parser {
     Token token;          // current token 
@@ -257,19 +258,26 @@ public class Parser {
             return new Value(false);
         }
 
+        // <expr> -> <bexp> {& <bexp> | '|'<bexp>}
         Expr e = bexp();
-	//
-	// parse logical operations
-	//
+        while(token == Token.AND || token == Token.OR){
+            Operator op = new Operator(match(token));
+            Expr t = bexp();
+            e = new Binary(op, e, t);
+        }
+
         return e;
     }
 
     private Expr bexp() {
         // <bexp> -> <aexp> [ (< | <= | > | >= | == | !=) <aexp> ]
         Expr e = aexp();
-	//
-	// parse relational operations
-	//
+        while (token == Token.EQUAL || token == Token.LT || token == Token.LTEQ ||
+        token == Token.GT || token == Token.GTEQ || token == Token.NOTEQ){
+                Operator op = new Operator(match(token));
+                Expr a = aexp();
+                e = new Binary(op, e, a);
+        }
         return e;
     }
   
@@ -378,7 +386,7 @@ public class Parser {
 
                 try {
                     command = parser.command();
-		            // if (command != null) command.display(0);    // display AST 
+		            if (command != null) command.display(0);    // display AST
                 } catch (Exception e) {
                     System.err.println(e);
                 }
@@ -394,7 +402,7 @@ public class Parser {
 
                 try {
 		             command = parser.command();
-		             // if (command != null) command.display(0);      // display AST
+		             if (command != null) command.display(0);      // display AST
                 } catch (Exception e) {
                     System.err.println(e); 
                 }

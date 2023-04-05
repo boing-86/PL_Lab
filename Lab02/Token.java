@@ -1,4 +1,4 @@
-// Token.java
+package Lab02;// Token.java
 import java.lang.Enum;
 
 enum Token {

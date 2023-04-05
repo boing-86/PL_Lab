@@ -1,10 +1,25 @@
-// AST.java
+package Lab02;// AST.java
 // AST for S
 import java.util.*;
+
+class Indent{
+    public static void display(int level, String s){
+        String tab = "";
+        System.out.println();
+
+        for(int i = 0 ; i < level; i++){
+            tab = tab + "    ";
+        }
+
+        System.out.print(tab + s);
+    }
+}
 
 abstract class Command {
     // Command = Decl | Function | Stmt
     Type type =Type.UNDEF;
+    // 최상위 override 용
+    public void display(int level){ }
 }
 
 class Decls extends ArrayList<Decl> {
@@ -118,6 +133,12 @@ class Assignment extends Stmt {
     Assignment (Array a, Expr e) {
         ar = a;
         expr = e;
+    }
+
+    public void display(int level){
+        Indent.display(level, "Assignment");
+        id.display(level + 1);
+        expr.display(level + 1);
     }
 }
 
@@ -244,6 +265,11 @@ class Identifier extends Expr {
         String s = ((Identifier) obj).id;
         return id.equals(s);
     }
+
+    public void display(int level){
+        Indent.display(level, "Identifier");
+        //
+    }
 }
 
 class Array extends Expr {
@@ -267,9 +293,10 @@ class Value extends Expr {
     Object value = null; // Type type;
     
     Value(Type t) {
-        type = t;  
-        if (type == Type.INT) value = new Integer(0);
-        if (type == Type.BOOL) value = new Boolean(false);
+        //Java9 이상에서는 deprecated error 가 발성해여 Integer.valueOf로 변경함.
+        type = t;
+        if (type == Type.INT) value = Integer.valueOf(0);
+        if (type == Type.BOOL) value = Boolean.valueOf(false);
         if (type == Type.STRING) value = "";
         undef = false;
     }
@@ -336,6 +363,13 @@ class Binary extends Expr {
     Binary (Operator o, Expr e1, Expr e2) {
         op = o; expr1 = e1; expr2 = e2;
     } // binary
+
+    public void display(int level){
+        Indent.display(level, "Binary");
+        op.display(level+1);
+        expr1.display(level+1);
+        expr2.display(level+1);
+    }
 }
 
 class Unary extends Expr {
@@ -363,5 +397,9 @@ class Operator {
 
     public boolean equals(Object obj) { 
 	return val.equals(obj); 
+    }
+
+    public void display(int level){
+        Indent.display(level, "Operator");
     }
 }

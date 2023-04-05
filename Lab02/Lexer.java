@@ -1,4 +1,4 @@
-// Lexer.java
+package Lab02;// Lexer.java
 // Lexical analyzer for S
 
 import java.io.*;
