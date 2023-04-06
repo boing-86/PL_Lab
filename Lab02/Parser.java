@@ -175,16 +175,18 @@ public class Parser {
     // <readStmt> -> read id;
     //
     // parse read statement
-    // 
-	return null;
+        match(Token.READ);
+        Identifier id = new Identifier(match(Token.ID));
+        match(Token.SEMICOLON);
+        return new Read(id);
     }
 
     private Print printStmt() {
     // <printStmt> -> print <expr>;
-    //
-    // parse print statement
-    // 
-	return null;
+        match(Token.PRINT);
+        Expr e = expr();
+        match(Token.SEMICOLON);
+	    return new Print(e);
     }
 
     private Return returnStmt() {
@@ -240,7 +242,12 @@ public class Parser {
     //
     // parse while statement
     //
-        return null;
+        match(Token.WHILE);
+        match(Token.LPAREN);
+        Expr e = expr();
+        match(Token.RPAREN);
+        Stmt ss = stmt();
+        return new While(e, ss);
     }
 
     private Expr expr () {

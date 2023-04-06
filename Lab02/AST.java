@@ -18,6 +18,7 @@ class Indent{
 abstract class Command {
     // Command = Decl | Function | Stmt
     Type type =Type.UNDEF;
+
     // 최상위 override 용
     public void display(int level){ }
 }
@@ -240,7 +241,6 @@ class Exprs extends ArrayList<Expr> {
 
 abstract class Expr extends Stmt {
     // Expr = Identifier | Value | Binary | Unary | Call
-
 }
 
 class Call extends Expr { 
@@ -268,7 +268,7 @@ class Identifier extends Expr {
 
     public void display(int level){
         Indent.display(level, "Identifier");
-        //
+        System.out.print(": " + id);
     }
 }
 
@@ -382,6 +382,12 @@ class Unary extends Expr {
         expr = e;
     } // unary
 
+    public void display(int level){
+        Indent.display(level, "Unary");
+        op.display(level + 1);
+        expr.display(level + 1);
+    }
+
 }
 
 class Operator {
@@ -401,5 +407,6 @@ class Operator {
 
     public void display(int level){
         Indent.display(level, "Operator");
+        System.out.print(": " +  val);
     }
 }
