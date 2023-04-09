@@ -41,7 +41,6 @@ class Decls extends ArrayList<Decl> {
             decl.display(level + 1);
         }
     }
-
 }
 
 
