@@ -1,6 +1,5 @@
 package Lab02;// AST.java
 // AST for S
-
 import java.util.*;
 
 class Indent{
@@ -9,7 +8,7 @@ class Indent{
         System.out.println();
 
         for(int i = 0 ; i < level; i++){
-            tab = tab + "      ";
+            tab = tab + "    ";
         }
 
         System.out.print(tab + s);
@@ -31,16 +30,7 @@ class Decls extends ArrayList<Decl> {
     Decls(Decl d) {
 	    this.add(d);
     }
-
-    public void display(int level){
-        Indent.display(level, "Decls");
-        for(Decl decl : this){
-            decl.display(level + 1);
-        }
-    }
-
 }
-
 
 class Decl extends Command {
     // Decl = Type type; Identifier id 
@@ -58,37 +48,11 @@ class Decl extends Command {
 
     Decl (String s, Type t, Expr e) {
         id = new Identifier(s); type = t; expr = e;
-    } // declaration
-
-    public void display(int level){
-        Indent.display(level, "Decl");
-        type.display(level + 1);
-        id.display(level + 1);
-
-        if(expr != null){
-            expr.display(level + 1);
-        }
-    }
-
+    } // declaration 
 }
 
 class Functions extends ArrayList<Function> {
     // Functions = Function*
-
-    Functions() {
-        super();
-    }
-
-    Functions(Function f) {
-        this.add(f);
-    }
-
-    public void display(int level){
-        Indent.display(level, "Functions");
-        for(Function f : this){
-            f.display(level + 1);
-        }
-    }
 }
 
 class Function extends Command  {
@@ -104,15 +68,6 @@ class Function extends Command  {
     public String toString ( ) { 
        return id.toString()+params.toString(); 
     }
-
-    public void display(int level){
-        Indent.display(level, "Fucntion");
-        type.display(level + 1);
-        id.display(level + 1);
-        params.display(level + 1);
-        stmt.display(level + 1);
-    }
-
 }
 
 class Type {
@@ -131,12 +86,6 @@ class Type {
     protected String id;
     protected Type(String s) { id = s; }
     public String toString ( ) { return id; }
-
-    public void display(int level){
-        Indent.display(level, "Type");
-        System.out.print(": " +  id);
-    }
-
 }
 
 class ProtoType extends Type {
@@ -155,29 +104,20 @@ abstract class Stmt extends Command {
 }
 
 class Empty extends Stmt {
-    public void display(){
-    }
+
 }
 
 class Stmts extends Stmt {
     // Stmts = Stmt*
-
     public ArrayList<Stmt> stmts = new ArrayList<Stmt>();
-
+    
     Stmts() {
-        super();
-    };
+	    super(); 
+    }
+
     Stmts(Stmt s) {
-        stmts.add(s);
+	     stmts.add(s);
     }
-
-    public void display(int level){
-        Indent.display(level, "Stmts");
-        for(Stmt stmt : stmts){
-            stmt.display(level + 1);
-        }
-    }
-
 }
 
 class Assignment extends Stmt {
@@ -215,13 +155,6 @@ class If extends Stmt {
     If (Expr t, Stmt tp, Stmt ep) {
         expr = t; stmt1 = tp; stmt2 = ep; 
     }
-
-    public void display(int level){
-        Indent.display(level, "If");
-        expr.display(level+1);
-        stmt1.display(level+1);
-        stmt2.display(level+1);
-    }
 }
 
 class While extends Stmt {
@@ -231,12 +164,6 @@ class While extends Stmt {
 
     While (Expr t, Stmt b) {
         expr = t; stmt = b;
-    }
-
-    public void display(int level){
-        Indent.display(level, "While");
-        expr.display(level+1);
-        stmt.display(level+1);
     }
 }
 
@@ -257,16 +184,6 @@ class Let extends Stmt {
 	    funs = fs;
         stmts = ss;
     }
-
-    public void display(int level){
-        Indent.display(level, "Let");
-        decls.display(level+1);
-
-        if (funs != null){
-            funs.display(level+1);
-        }
-        stmts.display(level+1);
-    }
 }
 
 class Read extends Stmt {
@@ -275,11 +192,6 @@ class Read extends Stmt {
 
     Read (Identifier v) {
         id = v;
-    }
-
-    public void display(int level){
-        Indent.display(level, "Read");
-        id.display(level+1);
     }
 }
 
@@ -290,11 +202,6 @@ class Print extends Stmt {
     Print (Expr e) {
         expr = e;
     }
-
-    public void display(int level){
-        Indent.display(level, "Print");
-        expr.display(level+1);
-    }
 }
 
 class Return extends Stmt {
@@ -304,12 +211,6 @@ class Return extends Stmt {
     Return (String s, Expr e) {
         fid = new Identifier(s);
         expr = e;
-    }
-
-    public void display(int level){
-        Indent.display(level, "Return");
-        fid.display(level+1);
-        expr.display(level+1);
     }
 }
 
@@ -336,20 +237,6 @@ class Raise extends Stmt {
 
 class Exprs extends ArrayList<Expr> {
     // Exprs = Expr*
-    // public ArrayList<Expr> es = new ArrayList<Expr>();
-
-    Exprs() { super(); };
-    Exprs(Expr e) {
-        this.add(e);
-    }
-
-    public void display(int level){
-        Indent.display(level, "Exprs");
-        for(Expr expr : this){
-            expr.display(level + 1);
-        }
-    }
-
 }
 
 abstract class Expr extends Stmt {
@@ -397,12 +284,6 @@ class Array extends Expr {
     public boolean equals (Object obj) {
         String s = ((Array) obj).id.toString();
         return id.equals(s);
-    }
-
-    public void display(int level){
-        Indent.display(level, "Array");
-        id.display(level + 1);
-        expr.display(level + 1);
     }
 }
 
@@ -471,11 +352,6 @@ class Value extends Expr {
         if (type == Type.FUN) return "" + funValue();
         if (type == Type.ARRAY) return "" + arrValue();
         return "undef";
-    }
-
-    public void display(int level){
-        Indent.display(level, "Value");
-        System.out.print(": " +  value);
     }
 }
 
