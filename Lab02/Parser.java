@@ -14,8 +14,10 @@ public class Parser {
   
     private String match(Token t) {
         String value = token.value();
-        if (token == t)
+        if (token == t){
+            //System.out.println("########### : " + value + " " +token);
             token = lexer.getToken();
+        }
         else
             error(t);
         return value;
@@ -76,32 +78,30 @@ public class Parser {
         return ds;             
     }
 
-/*
-    private Function function() {
-    // <function>  -> fun <type> id(<params>) <stmt> 
-        match(Token.FUN);
-	    Type t = type();
-	    String str = match(Token.ID);
-	    funId = str; 
-	    Function f = new Function(str, t);
-	    match(Token.LPAREN);
-        if (token != Token.RPAREN)
-            f.params = params();
-	    match(Token.RPAREN);
-	    Stmt s = stmt();		
-	    f.stmt = s;
-	    return f;
-    }
+//    private Function function() {
+//    // <function>  -> fun <type> id(<params>) <stmt>
+//        match(Token.FUN);
+//	    Type t = type();
+//	    String str = match(Token.ID);
+//	    funId = str;
+//	    Function f = new Function(str, t);
+//	    match(Token.LPAREN);
+//        if (token != Token.RPAREN)
+//            f.params = params();
+//	    match(Token.RPAREN);
+//	    Stmt s = stmt();
+//	    f.stmt = s;
+//	    return f;
+//    }
+//
+//    private Decls params() {
+//	    Decls params = new Decls();
+//
+//		// parse declrations of parameters
+//
+//        return params;
+//    }
 
-    private Decls params() {
-	    Decls params = new Decls();
-        
-		// parse declrations of parameters
-
-        return params;
-    }
-
-*/
 
     private Type type () {
     // <type>  ->  int | bool | void | string 
@@ -126,29 +126,31 @@ public class Parser {
     // <stmt> -> <block> | <assignment> | <ifStmt> | <whileStmt> | ...
         Stmt s = new Empty();
         switch (token) {
-	    case SEMICOLON:
-            match(token.SEMICOLON); return s;
-        case LBRACE:			
-	        match(Token.LBRACE);		
-            s = stmts();
-            match(Token.RBRACE);	
-	        return s;
-        case IF: 	// if statement 
-            s = ifStmt(); return s;
-        case WHILE:      // while statement 
-            s = whileStmt(); return s;
-        case ID:	// assignment
-            s = assignment(); return s;
-	    case LET:	// let statement 
-            s = letStmt(); return s;
-	    case READ:	// read statement 
-            s = readStmt(); return s;
-	    case PRINT:	// print statment 
-            s = printStmt(); return s;
-	    case RETURN: // return statement 
-            s = returnStmt(); return s;
-        default:  
-	        error("Illegal stmt"); return null; 
+            case SEMICOLON:
+                match(token.SEMICOLON); return s;
+            case LBRACE:
+                match(Token.LBRACE);
+                s = stmts();
+                match(Token.RBRACE);
+                return s;
+            case IF: 	// if statement
+                s = ifStmt(); return s;
+            case WHILE:      // while statement
+                s = whileStmt(); return s;
+            case ID:	// assignment
+                s = assignment(); return s;
+            case LET:	// let statement
+                s = letStmt(); return s;
+            case READ:	// read statement
+                s = readStmt(); return s;
+            case PRINT:	// print statment
+                s = printStmt();
+                return s;
+            case RETURN: // return statement
+                s = returnStmt(); return s;
+            default:
+                error("Illegal stmt");
+                return null;
 	    }
     }
   
@@ -156,7 +158,7 @@ public class Parser {
     // <block> -> {<stmt>}
         Stmts ss = new Stmts();
 	    while((token != Token.RBRACE) && (token != Token.END))
-	        ss.stmts.add(stmt()); 
+	        ss.stmts.add(stmt());
         return ss;
     }
 
@@ -193,7 +195,7 @@ public class Parser {
     // <returnStmt> -> return <expr>; 
         match(Token.RETURN);
         Expr e = expr();
-        match(Token.SEMICOLON);
+        System.out.print(match(Token.SEMICOLON));
         return new Return(funId, e);
     }
 
@@ -330,7 +332,7 @@ public class Parser {
             break;
         case NUMBER: case STRLITERAL: 
             e = literal();
-            break; 
+            break;
         case LPAREN: 
             match(Token.LPAREN); 
             e = aexp();       
@@ -388,14 +390,17 @@ public class Parser {
 	        Lexer.interactive = true;
 	        parser  = new Parser(new Lexer());
 	        do {
-	            if (parser.token == Token.EOF) 
-		        parser.token = parser.lexer.getToken();
+	            if (parser.token == Token.EOF) {
+                    parser.token = parser.lexer.getToken();
+                }
 
                 try {
                     command = parser.command();
-		            if (command != null) command.display(0);    // display AST
+		            if (command != null){
+                        command.display(0);    // display AST
+                    }
                 } catch (Exception e) {
-                    System.err.println(e);
+                    System.err.println(e );
                 }
 		        System.out.print("\n>> ");
 	        } while(true);
