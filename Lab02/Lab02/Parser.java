@@ -139,11 +139,6 @@ public class Parser {
                 s = whileStmt(); return s;
             case ID:	// assignment
                 s = assignment(); return s;
-            case DO:
-                s = dowhileStmt(); return s;
-            case FOR:
-                s = forStmt();
-                return s;
             case LET:	// let statement
                 s = letStmt(); return s;
             case READ:	// read statement
@@ -253,44 +248,6 @@ public class Parser {
         match(Token.RPAREN);
         Stmt ss = stmt();
         return new While(e, ss);
-    }
-
-    private  Stmts dowhileStmt(){
-        Stmts ss = new Stmts();
-        match(Token.DO);
-        Stmt s1 = stmt();
-        match(Token.WHILE);
-        match(Token.LPAREN);
-        Expr e = expr();
-        match(Token.RPAREN);
-        ss.stmts.add(s1);
-        ss.stmts.add(new While(e, s1));
-
-        return ss;
-    }
-
-    private  Let forStmt(){
-        // 아직 완성 안함
-        Stmts ss = new Stmts();
-
-        match(Token.FOR);
-        match(Token.LPAREN);
-
-        Decls ds = decls();
-
-        Expr e2 = expr();
-        match(Token.SEMICOLON);
-
-        Identifier id = new Identifier(match(Token.ID));
-        match(Token.ASSIGN);
-        Expr e3 = expr();
-        match(Token.RPAREN);
-        Assignment a = new Assignment(id, e3);
-        Stmt s1 = stmt();
-
-        ss.stmts.add(s1);
-        ss.stmts.add(a);
-        return new Let(ds, null, new Stmts(new While(e2, ss)));
     }
 
     private Expr expr () {
