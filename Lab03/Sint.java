@@ -1,4 +1,4 @@
-package Lab02;
+package Lab03;
 // Sint.java
 // Interpreter for S
 import java.util.Scanner;
@@ -49,55 +49,6 @@ public class Sint {
 	        return Eval((Return)s, state);
         throw new IllegalArgumentException("no statement");
     }
-
-/*
-    // call without return value
-    State Eval(Call c, State state) {
-	//
-	// evaluate call without return value
-	//
-	    return state;
-    }
-
-    // value-returning call 
-    Value V (Call c, State state) { 
-	    Value v = state.get(c.fid);  			// find function
-        Function f = v.funValue();
-        State s = newFrame(state, c, f);	// create new frame on the stack
-        s = Eval(f.stmt, s); 						// interpret the call
-	    v = s.peek().val;							// get the return value  v = s.get(new Identifier("return")); 
-        s = deleteFrame(s, c, f); 				// delete the frame on the stack
-    	return v;
-    }
-
-    State Eval(Return r, State state) {
-        Value v = V(r.expr, state);
-		return state.set(new Identifier("return"), v); 
-    }
-
-    State newFrame (State state, Call c, Function f) {
-        if (c.args.size() == 0) 
-            return state;
-	//
-	// evaluate arguments
-	//
-
-	//
-	// activate a new stack frame in the stack 
-	//
-	
-	    state.push(new Identifier("return"), null); // allocate for return value
-        return state;
-    }
-
-    State deleteFrame (State state, Call c, Function f) {
-	    state.pop();  // pop the return value
-	//
-	// free a stack frame from the stack
-	//
-	    return state;
-    }
-*/
 
     State Eval(Empty s, State state) {
         return state;
@@ -164,10 +115,10 @@ public class Sint {
         if (ds != null){
             for(Decl d : ds){
                     if(d.expr == null){
-                        state.push(d.id, new Value(0));
+                        state.push(d.id, new Value(d.type));
                     }
                     else{
-                        state.push(d.id, (Value)new Value(d.expr).value);
+                        state.push(d.id, V(d.expr, state));
                     }
             }
         }
@@ -332,8 +283,9 @@ public class Sint {
 				    if (command == null) 
 						 throw new Exception();
 					 else  {
-						 command.type = TypeChecker.Check(command); 
-                         System.out.println("\nType: "+ command.type); 
+                        command.display(0);
+                        //command.type = TypeChecker.Check(command);
+                         //System.out.println("\nType: "+ command.type);
 					 }
                 } catch (Exception e) {
                     System.out.println(e);
@@ -369,7 +321,7 @@ public class Sint {
 						 throw new Exception();
 					 else  {
                          command.display(0);
-						 command.type = TypeChecker.Check(command);
+						 // command.type = TypeChecker.Check(command);
                          // System.out.println("\nType: "+ command.type);
 					 }
                 } catch (Exception e) {
