@@ -56,6 +56,7 @@ public class Parser {
         Type t = type();
 	    String id = match(Token.ID);
 	    Decl d = null;
+
 	    if (token == Token.ASSIGN) {
 	        match(Token.ASSIGN);
             Expr e = expr();
@@ -65,7 +66,7 @@ public class Parser {
         else if (token == Token.LBRACKET){
             match(Token.LBRACKET);
             Value n = literal();
-            d = new Decl(id, t, n);
+            d = new Decl(id, t, n.intValue());
             match(Token.RBRACKET);
         }
 
@@ -229,10 +230,10 @@ public class Parser {
             match(Token.SEMICOLON);
             a = new Assignment(id, e);
         }
-        else if(token == Token.LPAREN){
-            match(Token.LPAREN);
+        else if(token == Token.LBRACKET){
+            match(Token.LBRACKET);
             Expr e0 = expr();
-            match(Token.RPAREN);
+            match(Token.RBRACKET);
             match(Token.ASSIGN);
             Expr e1 = expr();
             a = new Assignment(new Array(id, e0), e1);

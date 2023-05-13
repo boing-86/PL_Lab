@@ -66,6 +66,9 @@ class Decl extends Command {
         Indent.display(level, "Decl");
         type.display(level + 1);
         id.display(level + 1);
+        if(arraysize != 0){
+            System.out.println("\narraysize = [" + arraysize + "]");
+        }
 
         if(expr != null){
             expr.display(level + 1);
@@ -200,9 +203,14 @@ class Assignment extends Stmt {
 
     public void display(int level){
         Indent.display(level, "Assignment");
-        id.display(level + 1);
-        ar.display(level + 1);
-        expr.display(level + 1);
+        if(ar != null){
+            ar.display(level+1);
+            expr.display(level+1);
+        }
+        else{
+            id.display(level + 1);
+            expr.display(level + 1);
+        }
     }
 }
 
@@ -469,7 +477,7 @@ class Value extends Expr {
     }
 
     Value[] arrValue ( ) {
-        if (value instanceof Value[]) 
+        if (value instanceof Value[])
             return (Value[]) value; 
         else return null;
     }

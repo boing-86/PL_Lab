@@ -20,8 +20,9 @@ public class Sint {
             return state;
         }
 
-        if (c instanceof Stmt)
+        if (c instanceof Stmt){
             return Eval((Stmt) c, state);
+        }
 		
 	    throw new IllegalArgumentException("no command");
     }
@@ -55,6 +56,14 @@ public class Sint {
     }
   
     State Eval(Assignment a, State state) {
+
+        if(a.ar != null){ //id[<expr>] = <expr>;
+            Value v = V(a.expr, state);
+            Value idx = V(a.ar.expr, state);
+            Value[] arr = (state.get(a.ar.id)).arrValue();
+            arr[idx.intValue()] = v;
+            return state.set(a.ar.id, new Value(arr));
+        }
 
         Value v = V(a.expr, state);
 	    return state.set(a.id, v);
@@ -116,12 +125,21 @@ public class Sint {
         if (ds != null){
             for(Decl d : ds){
                     if(d.expr == null){
-                        state.push(d.id, new Value(0));
+                        if(d.arraysize > 0){ //<type> id[n]
+                            state.push(d.id, new Value(new Value[d.arraysize]));
+                        }
+                        else{
+                            state.push(d.id, new Value(0));
+                        }
                     }
                     else{
-                        state.push(d.id, (Value)new Value(d.expr).value);
+                        state.push(d.id, V(d.expr, state));
                     }
             }
+
+//            for(Pair a : state){
+//                System.out.println(a.id + " : " + a.val);
+//            }
             return state;
         }
         return null;
@@ -267,9 +285,13 @@ public class Sint {
         if (e instanceof Array){
             //id[<expr>]
             Array a = (Array) e;
-
             Value v = V(a.expr, state);
-            return v;
+            Value[] arr = (state.get(a.id)).arrValue();
+            return arr[v.intValue()];
+
+            // Value arr = (Value)(state.get(a.id));
+            // Value[] a = arr.arrValue();
+            //return a[v.intValue()];
         }
 
         throw new IllegalArgumentException("no operation");
@@ -296,7 +318,7 @@ public class Sint {
 						 throw new Exception();
 					 else  {
 						 command.type = TypeChecker.Check(command); 
-                         System.out.println("\nType: "+ command.type); 
+                         //System.out.println("\nType: "+ command.type);
 					 }
                 } catch (Exception e) {
                     System.out.println(e);
@@ -315,8 +337,9 @@ public class Sint {
 		    System.out.print(">> ");
 	        } while (true);
 	    }
+
         else {
-	        System.out.println("Begin parsing... " + args[0]);
+	        System.out.println("##### Begin parsing... " + args[0]);
 	        Command command = null;
 	        Parser parser  = new Parser(new Lexer(args[0]));
 	        Sint sint = new Sint();
@@ -324,14 +347,15 @@ public class Sint {
 	        do {	// Program = Command*
 	            if (parser.token == Token.EOF)
                     break;
-	         
+
                 try {
 	                command = parser.command();
                     //if (command != null)  command.display(0);    // display AST
-				    if (command == null)
-						 throw new Exception();
-					 else  {
-                         command.display(0);
+				    if (command == null){
+                        throw new Exception();
+                    }
+                    else  {
+                         // command.display(0);
 						 command.type = TypeChecker.Check(command);
                          // System.out.println("\nType: "+ command.type);
 					 }
@@ -341,7 +365,7 @@ public class Sint {
                 }
 
 	            if (command.type!=Type.ERROR) {
-                    System.out.println("\nInterpreting..." + args[0]);
+                    System.out.println("\n######## Interpreting..." + args[0]);
                     try {
                         state = sint.Eval(command, state);
                     } catch (Exception e) {

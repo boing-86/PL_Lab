@@ -1,8 +1,7 @@
-package Lab02;
+package Lab04;
 // TypeEnv.java
 // Type environment for S
 
-import Lab02.Identifier;
 
 import java.util.*;
 

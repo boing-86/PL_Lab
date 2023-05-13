@@ -1,4 +1,4 @@
-package Lab02;// TypeChecker.java
+package Lab04;// TypeChecker.java
 // Static type checker for S
 
 public class TypeChecker {
@@ -100,7 +100,18 @@ public class TypeChecker {
             return Check((Unary) e, te); 
 
         if (e instanceof Call) 
-            return Check((Call) e, te); 
+            return Check((Call) e, te);
+
+        if (e instanceof Array) {
+            Array ar = (Array) e;
+            if (!te.contains(ar.id))
+                error(ar, "undeclared variable: " + ar.id);
+            else if (Check(ar.expr, te) == Type.INT)
+                ar.type = te.get(ar.id);
+            else
+                error(ar, "non-int index: " + ar.expr);
+            return ar.type;
+        }
 
         throw new IllegalArgumentException("undefined operator");
     }
@@ -208,20 +219,53 @@ public class TypeChecker {
         return r.type;
     }
 
+//    static Type Check(Assignment a, TypeEnv te) {
+//        if (!te.contains(a.id)) {
+//            error(a, " undefined variable in assignment: " + a.id);
+//            return Type.ERROR;
+//        }
+//        Type t1 = te.get(a.id);
+//        Type t2 = Check(a.expr, te);
+//	    // System.err.println(t1 +" <- " + t2);
+//	    if (t1 == t2)
+//	        a.type = Type.VOID;
+//	    else
+//	        error(a,  "mixed mode assignment to " + a.id);
+//        return a.type;
+//    }
+
     static Type Check(Assignment a, TypeEnv te) {
-        if (!te.contains(a.id)) {
+        if (a.ar != null) { // array
+            if (!te.contains(a.ar.id)) {
+                error(a, " undefined variable in assignment: " + a.ar.id);
+                return Type.ERROR;
+            }
+            Type t1 = te.get(a.ar.id);
+            Type t2 = Check(a.ar.expr, te);
+            Type t3 = Check(a.expr, te);
+            if (t1 == t3 && t2 == Type.INT)
+                a.type = Type.VOID;
+            else
+                error(a, "mixed mode assignment to " + a.ar.id + " : " + t1 + " <- " + t2);
+            return a.type;
+        }
+
+        else{
+            if (!te.contains(a.id)) {
             error(a, " undefined variable in assignment: " + a.id);
             return Type.ERROR;
         }
         Type t1 = te.get(a.id);
         Type t2 = Check(a.expr, te);
 	    // System.err.println(t1 +" <- " + t2);
-	    if (t1 == t2) 
+	    if (t1 == t2)
 	        a.type = Type.VOID;
 	    else
 	        error(a,  "mixed mode assignment to " + a.id);
         return a.type;
+        }
     }
+
 
     static Type Check(If c, TypeEnv te) {
        Type t  = Check(c.expr,te);
@@ -255,8 +299,9 @@ public class TypeChecker {
 	    Type t = Type.VOID;
         for (int i=0; i < ss.stmts.size(); i++) {
             t = Check(ss.stmts.get(i), te);
-            if (t != Type.VOID && i != ss.stmts.size()-1)
+            if (t != Type.VOID && i != ss.stmts.size()-1) {
                 error(ss, "return in block");
+            }
         }
 
         if (ss.type != Type.ERROR) ss.type = t;
