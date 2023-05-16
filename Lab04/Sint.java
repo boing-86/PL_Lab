@@ -339,7 +339,7 @@ public class Sint {
 	    }
 
         else {
-	        System.out.println("##### Begin parsing... " + args[0]);
+	        System.out.println("Begin parsing... " + args[0]);
 	        Command command = null;
 	        Parser parser  = new Parser(new Lexer(args[0]));
 	        Sint sint = new Sint();
@@ -365,7 +365,7 @@ public class Sint {
                 }
 
 	            if (command.type!=Type.ERROR) {
-                    System.out.println("\n######## Interpreting..." + args[0]);
+                    System.out.println("\nInterpreting..." + args[0]);
                     try {
                         state = sint.Eval(command, state);
                     } catch (Exception e) {

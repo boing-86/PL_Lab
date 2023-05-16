@@ -236,6 +236,7 @@ public class Parser {
             match(Token.RBRACKET);
             match(Token.ASSIGN);
             Expr e1 = expr();
+            match(Token.SEMICOLON);
             a = new Assignment(new Array(id, e0), e1);
         }
 
