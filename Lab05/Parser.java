@@ -1,4 +1,4 @@
-package Lab03;// Parser.java
+package Lab05;// Parser.java
 // Parser for language S
 
 
@@ -51,16 +51,28 @@ public class Parser {
     }
 
     private Decl decl() {
-    // <decl>  -> <type> id [=<expr>]; 
+        // <decl>  -> <type> id [=<expr>];
+        // <decl> -> <type> id'['n']';
         Type t = type();
 	    String id = match(Token.ID);
 	    Decl d = null;
+
 	    if (token == Token.ASSIGN) {
 	        match(Token.ASSIGN);
             Expr e = expr();
 	        d = new Decl(id, t, e);
-	    } else 
+	    }
+
+        else if (token == Token.LBRACKET){
+            match(Token.LBRACKET);
+            Value n = literal();
+            d = new Decl(id, t, n.intValue());
+            match(Token.RBRACKET);
+        }
+
+        else {
             d = new Decl(id, t);
+        }
 
 	    match(Token.SEMICOLON);
 	    return d;
@@ -76,19 +88,18 @@ public class Parser {
         return ds;             
     }
 
-/*
     private Function function() {
     // <function>  -> fun <type> id(<params>) <stmt> 
         match(Token.FUN);
 	    Type t = type();
 	    String str = match(Token.ID);
-	    funId = str; 
+	    funId = str;
 	    Function f = new Function(str, t);
 	    match(Token.LPAREN);
         if (token != Token.RPAREN)
             f.params = params();
 	    match(Token.RPAREN);
-	    Stmt s = stmt();		
+	    Stmt s = stmt();
 	    f.stmt = s;
 	    return f;
     }
@@ -100,8 +111,6 @@ public class Parser {
 
         return params;
     }
-
-*/
 
     private Type type () {
     // <type>  ->  int | bool | void | string 
@@ -203,28 +212,43 @@ public class Parser {
     }
 
     private Stmt assignment() {
-    // <assignment> -> id = <expr>;   
+        // <assignment> -> id = <expr>;
+        // <assignment> -> id[<expr>] = <expr>;
+
+        Stmt a = null;
         Identifier id = new Identifier(match(Token.ID));
 	/*
 	    if (token == Token.LPAREN)    // function call
 	        return call(id);
 	*/
+        if(token == Token.ASSIGN){
+            match(Token.ASSIGN);
+            Expr e = expr();
+            match(Token.SEMICOLON);
+            a = new Assignment(id, e);
+        }
+        else if(token == Token.LBRACKET){
+            match(Token.LBRACKET);
+            Expr e0 = expr();
+            match(Token.RBRACKET);
+            match(Token.ASSIGN);
+            Expr e1 = expr();
+            match(Token.SEMICOLON);
+            a = new Assignment(new Array(id, e0), e1);
+        }
 
-        match(Token.ASSIGN);
-        Expr e = expr();
-        match(Token.SEMICOLON);
-        return new Assignment(id, e);
+
+        return a;
     }
 
-/*
     private Call call(Identifier id) {
     // <call> -> id(<expr>{,<expr>});
-    //
-    // parse function call
-    //
-	return null;
+        match(Token.LPAREN);
+        Call c = new Call(id, arguments());
+        match((Token.RPAREN));
+        match(Token.SEMICOLON);
+        return c;
     }
-*/
 
     private If ifStmt () {
     // <ifStmt> -> if (<expr>) then <stmt> [else <stmt>]
@@ -354,12 +378,13 @@ public class Parser {
     }
   
     private Expr factor() {
-        // <factor> -> [-](id | <call> | literal | '('<aexp> ')')
+        // <factor> -> [-](id | id'['<expr>']' | <call> | literal | '('<aexp> ')')
         Operator op = null;
         if (token == Token.MINUS) 
             op = new Operator(match(Token.MINUS));
 
         Expr e = null;
+
         switch(token) {
         case ID:
             Identifier v = new Identifier(match(Token.ID));
@@ -369,16 +394,25 @@ public class Parser {
                 Call c = new Call(v,arguments());
                 match(Token.RPAREN);
                 e = c;
-            } 
+            }
+            else if (token == Token.LBRACKET){ //Array
+                match(Token.LBRACKET);
+                Array a = new Array(v, expr());
+                match(Token.RBRACKET);
+                e = a;
+            }
             break;
+
         case NUMBER: case STRLITERAL: 
             e = literal();
-            break; 
+            break;
+
         case LPAREN: 
             match(Token.LPAREN); 
             e = aexp();       
             match(Token.RPAREN);
-            break; 
+            break;
+
         default: 
             error("Identifier | Literal"); 
         }
