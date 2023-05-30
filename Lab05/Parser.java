@@ -37,12 +37,12 @@ public class Parser {
 	        Decl d = decl();
 	        return d;
 	    }
-	/*
+
 	    if (token == Token.FUN) {
 	        Function f = function();
 	        return f;
 	    }
-	*/
+
 	    if (token != Token.EOF) {
 	        Stmt s = stmt();
             return s;
@@ -105,9 +105,24 @@ public class Parser {
     }
 
     private Decls params() {
+        // parse declrations of parameters
+        // <params> -> <type> id, {, <type> id}
 	    Decls params = new Decls();
-        
-		// parse declrations of parameters
+        Type t = type();
+        String id = match(Token.ID);
+        params.add(new Decl(id, t));
+
+        while(token != Token.RPAREN){
+            if(token == Token.COMMA){
+                match(Token.COMMA);
+                t = type();
+                id = match(Token.ID);
+                params.add(new Decl(id, t));
+            }
+            else if (token != Token.RPAREN){
+                error("Params");
+            }
+        }
 
         return params;
     }

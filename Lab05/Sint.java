@@ -123,7 +123,11 @@ public class Sint {
 
     State Eval(Call c, State state){
         // evaluate call without return value
-
+        Value v = state.get(c.fid);
+        Function f = v.funValue();
+        State s = newFrame(state, c, f);
+        s = Eval(f.stmt, s);
+        s = deleteFrame(s, c, f);
         return null;
     }
 
