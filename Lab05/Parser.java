@@ -106,24 +106,18 @@ public class Parser {
 
     private Decls params() {
         // parse declrations of parameters
-        // <params> -> <type> id, {, <type> id}
+        // <params> -> <type> id, {, <type> id }
 	    Decls params = new Decls();
         Type t = type();
         String id = match(Token.ID);
         params.add(new Decl(id, t));
 
-        while(token != Token.RPAREN){
-            if(token == Token.COMMA){
+        while(token == Token.COMMA){
                 match(Token.COMMA);
                 t = type();
                 id = match(Token.ID);
                 params.add(new Decl(id, t));
             }
-            else if (token != Token.RPAREN){
-                error("Params");
-            }
-        }
-
         return params;
     }
 
@@ -251,8 +245,6 @@ public class Parser {
             match(Token.SEMICOLON);
             a = new Assignment(new Array(id, e0), e1);
         }
-
-
         return a;
     }
 
@@ -309,7 +301,6 @@ public class Parser {
     }
 
     private  Let forStmt(){
-        // 아직 완성 안함
         Stmts ss = new Stmts();
 
         match(Token.FOR);

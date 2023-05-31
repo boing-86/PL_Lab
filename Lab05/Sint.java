@@ -56,7 +56,6 @@ public class Sint {
     }
   
     State Eval(Assignment a, State state) {
-
         if(a.ar != null){ //id[<expr>] = <expr>;
             Value v = V(a.expr, state);
             Value idx = V(a.ar.expr, state);
@@ -151,10 +150,6 @@ public class Sint {
                         state.push(d.id, V(d.expr, state));
                     }
             }
-
-//            for(Pair a : state){
-//                System.out.println(a.id + " : " + a.val);
-//            }
             return state;
         }
         return null;
@@ -168,10 +163,13 @@ public class Sint {
         int i = 0;
         for (Expr e : c.args){
             val[i++] = V(e, state);
-            // state에 푸시하는 방법을 사용할 수 있음
-            //
-            //
         }
+
+        i = 0;
+        for (Decl d : f.params){
+            state.push(d.id, val[i++]);
+        }
+        state.push(new Identifier("return"), null);
         return state;
     }
 
@@ -185,8 +183,8 @@ public class Sint {
     }
 
     State deleteFrame(State state, Call c, Function f){
-        // 프레임에서 반환값 엔트리 제거
-        // 프레임에서 매개변수를 위한 기억공간을 제거 (free)
+        state.pop();
+        state = free(f.params, state);
         return state;
     }
 
